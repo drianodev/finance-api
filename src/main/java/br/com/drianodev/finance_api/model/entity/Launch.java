@@ -22,30 +22,30 @@ import java.time.LocalDate;
 public class Launch {
 
     @Id
-    String id;
+    private String id;
 
     @Field("description")
-    String description;
+    private String description;
 
     @Field("month")
-    Integer month;
+    private Integer month;
 
     @Field("year")
-    Integer year;
+    private Integer year;
 
     @Field("value")
-    BigDecimal value;
+    private BigDecimal value;
 
     @Field("type")
-    LaunchType type;
+    private LaunchType type;
 
     @Field("status")
-    LaunchStatus status;
+    private LaunchStatus status;
 
     @DBRef
     @Field("user")
-    User user;
+    private User user;
 
     @Field("registration_date")
-    LocalDate registrationDate;
+    private LocalDate registrationDate;
 }
