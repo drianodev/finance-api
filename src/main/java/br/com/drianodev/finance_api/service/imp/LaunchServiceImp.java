@@ -82,13 +82,13 @@ public class LaunchServiceImp implements LaunchService {
     @Override
     @Transactional(readOnly = true)
     public BigDecimal getBalanceByUser(String id) {
-        BigDecimal income = launchRepository.getBalanceByTypeLaunchAndUserStatus(id, LaunchType.INCOME, LaunchStatus.EFFECTIVE);
-        BigDecimal expense = launchRepository.getBalanceByTypeLaunchAndUserStatus(id, LaunchType.EXPENSE, LaunchStatus.EFFECTIVE);
+        Double income = launchRepository.getBalanceByTypeLaunchAndUserStatus(id, LaunchType.INCOME, LaunchStatus.EFFECTIVE);
+        Double expense = launchRepository.getBalanceByTypeLaunchAndUserStatus(id, LaunchType.EXPENSE, LaunchStatus.EFFECTIVE);
 
-        income = (income == null) ? BigDecimal.ZERO : income;
-        expense = (expense == null) ? BigDecimal.ZERO : expense;
+        BigDecimal incomeValue = (income == null) ? BigDecimal.ZERO : BigDecimal.valueOf(income);
+        BigDecimal expenseValue = (expense == null) ? BigDecimal.ZERO : BigDecimal.valueOf(expense);
 
-        return income.subtract(expense);
+        return incomeValue.subtract(expenseValue);
     }
 
     private boolean isNullOrEmpty(String str) {

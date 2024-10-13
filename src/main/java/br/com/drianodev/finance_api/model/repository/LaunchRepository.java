@@ -7,11 +7,10 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.math.BigDecimal;
-
 @Repository
 public interface LaunchRepository extends MongoRepository<Launch, String> {
 
     @Query(value = "{ 'user.id' : ?0, 'type' : ?1, 'status' : ?2 }")
-    BigDecimal getBalanceByTypeLaunchAndUserStatus(String idUser, LaunchType type, LaunchStatus status);
+    Double getBalanceByTypeLaunchAndUserStatus(String idUser, LaunchType type, LaunchStatus status);
 }
+
