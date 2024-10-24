@@ -1,8 +1,6 @@
 package br.com.drianodev.finance_api.model.entity;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,19 +10,22 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "users")
+@Entity
+@Table(name = "users")
 public class User {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Field("name")
+    @Column(name = "name")
     private String name;
 
-    @Field("email")
+    @Column(name = "email")
     private String email;
 
-    @Field("password")
+    @Column(name = "password")
     private String password;
 }
+
 

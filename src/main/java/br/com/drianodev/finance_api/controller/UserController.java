@@ -7,13 +7,16 @@ import br.com.drianodev.finance_api.model.entity.User;
 import br.com.drianodev.finance_api.service.LaunchService;
 import br.com.drianodev.finance_api.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
@@ -21,6 +24,12 @@ public class UserController {
 
     private final UserService userService;
     private final LaunchService launchService;
+
+    @GetMapping
+    public ResponseEntity findAll() {
+        List<User> listUser = userService.findAll();
+        return ResponseEntity.ok(listUser);
+    }
 
     @PostMapping("/authenticate")
     public ResponseEntity authenticate(@RequestBody UserDTO userDTO) {
@@ -48,7 +57,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}/balance")
-    public ResponseEntity getBalance(@PathVariable("id") String id) {
+    public ResponseEntity getBalance(@PathVariable("id") Long id) {
         Optional<User> user = userService.getUserById(id);
 
         if (user.isEmpty()) return new ResponseEntity(HttpStatus.NOT_FOUND);
@@ -58,15 +67,16 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity update(@PathVariable("id") String id, @RequestBody UserDTO userDTO) {
+    public ResponseEntity update(@PathVariable("id") Long id, @RequestBody UserDTO userDTO) {
         Optional<User> user = userService.getUserById(id);
-
+        log.info("user - {}", user);
         if (user.isEmpty()) return new ResponseEntity(HttpStatus.NOT_FOUND);
 
         User updatedUser = user.get();
         updatedUser.setName(userDTO.getName());
         updatedUser.setEmail(userDTO.getEmail());
         updatedUser.setPassword(userDTO.getPassword());
+        log.info("updatedUser - {}", updatedUser);
         try {
             userService.updateUser(updatedUser);
             return ResponseEntity.ok(updatedUser);
@@ -76,7 +86,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity delete(@PathVariable("id") String id) {
+    public ResponseEntity delete(@PathVariable("id") Long id) {
         Optional<User> user = userService.getUserById(id);
 
         if (user.isEmpty()) return new ResponseEntity(HttpStatus.NOT_FOUND);

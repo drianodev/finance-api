@@ -17,6 +17,6 @@ public interface LaunchService {
     List<Launch> findLaunch(Launch filterLaunch);
     void updateStatusLaunch(Launch launch, LaunchStatus status);
     void validateLaunch(Launch launch);
-    Optional<Launch> getLaunchById(String id);
-    BigDecimal getBalanceByUser(String id);
+    Optional<Launch> getLaunchById(Long id);
+    BigDecimal getBalanceByUser(Long id);
 }

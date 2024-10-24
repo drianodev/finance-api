@@ -2,14 +2,12 @@ package br.com.drianodev.finance_api.model.entity;
 
 import br.com.drianodev.finance_api.model.enums.LaunchStatus;
 import br.com.drianodev.finance_api.model.enums.LaunchType;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -18,34 +16,40 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collation = "launches")
+@Entity
+@Table(name = "launches")
 public class Launch {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long idLaunch;
 
-    @Field("description")
+    @Column(name = "description")
     private String description;
 
-    @Field("month")
+    @Column(name = "month")
     private Integer month;
 
-    @Field("year")
+    @Column(name = "year")
     private Integer year;
 
-    @Field("value")
+    @Column(name = "value")
     private BigDecimal value;
 
-    @Field("type")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type")
     private LaunchType type;
 
-    @Field("status")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
     private LaunchStatus status;
 
-    @DBRef
-    @Field("user")
+    @ManyToOne
+    @JoinColumn(name = "user_id")
     private User user;
 
-    @Field("registration_date")
+    @Column(name = "registration_date")
+    @Convert(converter = Jsr310JpaConverters.LocalDateConverter.class)
     private LocalDate registrationDate;
 }
+

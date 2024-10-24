@@ -14,12 +14,12 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class LaunchDTO {
 
-    private String id;
+    private Long idLaunch;
     private String description;
     private Integer month;
     private Integer year;
     private BigDecimal value;
-    private User user;
+    private Long user;
     private String type;
     private String status;
 }

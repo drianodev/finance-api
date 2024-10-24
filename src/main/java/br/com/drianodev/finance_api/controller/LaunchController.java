@@ -10,6 +10,7 @@ import br.com.drianodev.finance_api.model.enums.LaunchType;
 import br.com.drianodev.finance_api.service.LaunchService;
 import br.com.drianodev.finance_api.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/launches")
 @RequiredArgsConstructor
@@ -33,7 +35,7 @@ public class LaunchController {
             @RequestParam(value = "month", required = false) Integer month,
             @RequestParam(value = "year", required = false) Integer year,
             @RequestParam(value = "type", required = false) LaunchType launchType,
-            @RequestParam("user") String idUser) {
+            @RequestParam("user") Long idUser) {
         Launch filterLaunch = new Launch();
         filterLaunch.setDescription(description);
         filterLaunch.setMonth(month);
@@ -42,20 +44,21 @@ public class LaunchController {
 
         Optional<User> user = userService.getUserById(idUser);
         if (user.isEmpty()) return ResponseEntity.badRequest().body("Não foi possivel realizar a consulta, usuário nao encontrado!");
-
+        log.info("user - {}", user);
         filterLaunch.setUser(user.get());
 
         List<Launch> launches = launchService.findLaunch(filterLaunch);
+        log.info("launches - {}", launches);
         List<Launch> orderedLaunches = launches.stream()
                 .sorted(Comparator.comparing(Launch::getYear).reversed()
                         .thenComparing(Comparator.comparing(Launch::getMonth).reversed()))
                 .collect(Collectors.toList());
-
+        log.info("orderedLaunches - {}", orderedLaunches);
         return ResponseEntity.ok(orderedLaunches);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity getLaunch(@PathVariable("id") String id) {
+    public ResponseEntity getLaunch(@PathVariable("id") Long id) {
         return launchService.getLaunchById(id).map(launch -> new ResponseEntity(convert(launch), HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity(HttpStatus.NOT_FOUND));
     }
@@ -63,6 +66,7 @@ public class LaunchController {
     @PostMapping
     public ResponseEntity save(@RequestBody LaunchDTO launchDTO) {
         try {
+            log.info("dto save - {}", launchDTO);
             Launch launch = convert(launchDTO);
             launch = launchService.saveLaunch(launch);
             return new ResponseEntity(launch, HttpStatus.CREATED);
@@ -72,11 +76,11 @@ public class LaunchController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity update(@PathVariable("id") String id, @RequestBody LaunchDTO launchDTO) {
+    public ResponseEntity update(@PathVariable("id") Long id, @RequestBody LaunchDTO launchDTO) {
         return launchService.getLaunchById(id).map(launchMap -> {
             try {
                 Launch launch = convert(launchDTO);
-                launch.setId(launchMap.getId());
+                launch.setIdLaunch(launchMap.getIdLaunch());
                 launchService.updateLaunch(launch);
                 return ResponseEntity.ok(launch);
             } catch (BusinessRulesException e) {
@@ -86,7 +90,7 @@ public class LaunchController {
     }
 
     @PutMapping("/{id}/update-status")
-    public ResponseEntity updateStatus(@PathVariable("id") String id, @RequestBody UpdateStatusDTO updateStatusDTO) {
+    public ResponseEntity updateStatus(@PathVariable("id") Long id, @RequestBody UpdateStatusDTO updateStatusDTO) {
         return launchService.getLaunchById(id).map(launchMap -> {
             LaunchStatus selectStatus = LaunchStatus.valueOf(updateStatusDTO.getStatus());
             if (selectStatus == null) {
@@ -100,7 +104,7 @@ public class LaunchController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity delete(@PathVariable("id") String id) {
+    public ResponseEntity delete(@PathVariable("id") Long id) {
         return launchService.getLaunchById(id).map(launchMap -> {
             launchService.deleteLaunch(launchMap);
             return new ResponseEntity(HttpStatus.NO_CONTENT);
@@ -109,28 +113,30 @@ public class LaunchController {
 
     private LaunchDTO convert(Launch launch) {
         return LaunchDTO.builder().
-                id(launch.getId()).
+                idLaunch(launch.getIdLaunch()).
                 description(launch.getDescription()).
                 value(launch.getValue()).
                 month(launch.getMonth()).
                 year(launch.getYear()).
                 status(launch.getStatus().name()).
                 type(launch.getType().name()).
-                user(launch.getUser()).
+                user(launch.getUser().getId()).
                 build();
     }
 
     private Launch convert(LaunchDTO launchDTO) {
+        log.info("launchDTO - {}", launchDTO);
         Launch launch = new Launch();
-        launch.setId(launchDTO.getId());
+        launch.setIdLaunch(launchDTO.getIdLaunch());
         launch.setDescription(launchDTO.getDescription());
         launch.setYear(launchDTO.getYear());
         launch.setMonth(launchDTO.getMonth());
         launch.setValue(launchDTO.getValue());
-        User user = userService.getUserById(launchDTO.getUser().getId())
+        User user = userService.getUserById(launchDTO.getUser())
                 .orElseThrow(() -> new BusinessRulesException("Usuário não encontrado!"));
         launch.setUser(user);
         launch.setType(LaunchType.valueOf(launchDTO.getType()));
+        log.info("launch - {}", launch);
         if (launchDTO.getStatus() != null) {
             launch.setStatus(LaunchStatus.valueOf(launchDTO.getStatus()));
         }

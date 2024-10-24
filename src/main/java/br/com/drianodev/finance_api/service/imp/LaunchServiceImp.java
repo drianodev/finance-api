@@ -7,7 +7,9 @@ import br.com.drianodev.finance_api.model.enums.LaunchStatus;
 import br.com.drianodev.finance_api.model.enums.LaunchType;
 import br.com.drianodev.finance_api.model.repository.LaunchRepository;
 import br.com.drianodev.finance_api.service.LaunchService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+@Slf4j
 @Service
 public class LaunchServiceImp implements LaunchService {
 
@@ -29,20 +32,20 @@ public class LaunchServiceImp implements LaunchService {
     public Launch saveLaunch(Launch launch) {
         launch.setStatus(LaunchStatus.PENDING);
         validateLaunch(launch);
-        return null;
+        return launchRepository.save(launch);
     }
 
     @Override
     @Transactional
     public Launch updateLaunch(Launch launch) {
-        Objects.requireNonNull(launch.getId());
+        Objects.requireNonNull(launch.getIdLaunch());
         return launchRepository.save(launch);
     }
 
     @Override
     @Transactional
     public void deleteLaunch(Launch launch) {
-        Objects.requireNonNull(launch.getId());
+        Objects.requireNonNull(launch.getIdLaunch());
         launchRepository.delete(launch);
     }
 
@@ -75,20 +78,20 @@ public class LaunchServiceImp implements LaunchService {
     }
 
     @Override
-    public Optional<Launch> getLaunchById(String id) {
+    public Optional<Launch> getLaunchById(Long id) {
         return launchRepository.findById(id);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public BigDecimal getBalanceByUser(String id) {
-        Double income = launchRepository.getBalanceByTypeLaunchAndUserStatus(id, LaunchType.INCOME, LaunchStatus.EFFECTIVE);
-        Double expense = launchRepository.getBalanceByTypeLaunchAndUserStatus(id, LaunchType.EXPENSE, LaunchStatus.EFFECTIVE);
+    public BigDecimal getBalanceByUser(Long id) {
+        BigDecimal income = launchRepository.getBalanceByBillingTypeAndUserStatus(id, LaunchType.INCOME, LaunchStatus.EFFECTIVE);
+        BigDecimal expense = launchRepository.getBalanceByBillingTypeAndUserStatus(id, LaunchType.EXPENSE, LaunchStatus.EFFECTIVE);
 
-        BigDecimal incomeValue = (income == null) ? BigDecimal.ZERO : BigDecimal.valueOf(income);
-        BigDecimal expenseValue = (expense == null) ? BigDecimal.ZERO : BigDecimal.valueOf(expense);
+        income = (income == null) ? BigDecimal.ZERO : income;
+        expense = (expense == null) ? BigDecimal.ZERO : expense;
 
-        return incomeValue.subtract(expenseValue);
+        return income.subtract(expense);
     }
 
     private boolean isNullOrEmpty(String str) {

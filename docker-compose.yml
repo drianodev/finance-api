@@ -1,37 +1,32 @@
 version: '3.8'
 
 services:
-  mongo:
-    image: mongo:5.0.1
-    container_name: mongodb
-    ports:
-      - "27017:27017"
+  postgres:
+    image: postgres:15.3
+    container_name: postgres
     environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: admin123
+      POSTGRES_DB: finance_db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: 1234
+    ports:
+      - "5432:5432"
     volumes:
-      - mongo-data:/data/db
-    networks:
-      - finance-network
+      - postgres-data:/var/lib/postgresql/data
 
   finance-api:
     image: openjdk:21-jdk
     container_name: finance-api
     depends_on:
-      - mongo
+      - postgres
     environment:
-      SPRING_DATA_MONGODB_URI: mongodb://admin:admin123@localhost:27017/finance_db
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/finance_db
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: 1234
     ports:
       - "8080:8080"
     volumes:
-      - ./target/finance-api.jar:/app/finance-api.jar
+      - ./target/finance-api-0.0.1-SNAPSHOT.jar:/app/finance-api.jar
     command: ["java", "-jar", "/app/finance-api.jar"]
-    networks:
-      - finance-network
 
 volumes:
-  mongo-data:
-
-networks:
-  finance-network:
-    driver: bridge
+  postgres-data:
