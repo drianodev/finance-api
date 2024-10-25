@@ -11,6 +11,6 @@ FROM openjdk:21-jdk
 
 EXPOSE 8080
 
-COPY ./target/finance-api-0.0.1-SNAPSHOT.jar /app/finance-api.jar
+COPY --from=build /target/finance-api-0.0.1-SNAPSHOT.jar /app/finance-api.jar
 
 ENTRYPOINT ["java", "-jar", "/app/finance-api.jar"]
