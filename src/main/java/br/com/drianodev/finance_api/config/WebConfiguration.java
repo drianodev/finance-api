@@ -11,7 +11,8 @@ public class WebConfiguration implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**").allowedOrigins("http://localhost:5173", "http://localhost:3000")
+        registry.addMapping("/**")
+                .allowedOrigins("http://localhost:5173", "http://localhost:3000", "https://finance-app-one-green.vercel.app")
                 .allowedMethods("GET", "POST", "PUT", "DELETE");
     }
 }
