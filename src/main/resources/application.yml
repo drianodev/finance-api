@@ -1,20 +1,5 @@
 spring:
   application:
     name: finance-api
-  datasource:
-    url: jdbc:postgresql://localhost:5432/finance_db
-    username: admin
-    password: 1234
-    driver-class-name: org.postgresql.Driver
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-  cache:
-    cache-names: users
-    expiration: 3600
-
-logging:
-  level:
-    root: INFO
-    br.com.drianodev: DEBUG
+  profiles:
+    active: prod

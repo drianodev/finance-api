@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://<render_database_host>:5432/finance_db_gnw3
+    username: <render_database_user>
+    password: <render_database_password>
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+  cache:
+    cache-names: users
+    expiration: 3600
