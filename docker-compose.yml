@@ -6,9 +6,9 @@ services:
     container_name: finance-api
     environment:
       SPRING_PROFILES_ACTIVE: prod
-      SPRING_DATASOURCE_URL: jdbc:postgresql://<render_database_host>:5432/finance_db_gnw3
-      SPRING_DATASOURCE_USERNAME: <render_database_user>
-      SPRING_DATASOURCE_PASSWORD: <render_database_password>
+      SPRING_DATASOURCE_URL: jdbc:postgresql://${render_database_host}:5432/finance_db_gnw3
+      SPRING_DATASOURCE_USERNAME: ${render_database_user}
+      SPRING_DATASOURCE_PASSWORD: ${render_database_password}
     ports:
       - "8080:8080"
     volumes:
